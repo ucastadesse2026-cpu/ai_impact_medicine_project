@@ -1,0 +1,71 @@
+# Frozen configuration — AI-augmented papers and citation impact (Medicine)
+# Any change here invalidates comparability with the reported results.
+project:
+  name: "Which AI-augmented papers actually gain impact?"
+  discipline: "Medicine (Europe PMC / PubMed, SRC:MED)"
+  version: "1.0.0"
+
+seeds:
+  sampling: 42        # random day-window selection
+  modeling: 42        # sklearn models, permutation importance
+  subsample: 42       # final working-sample subsampling
+
+sampling:
+  source: "Europe PMC REST API, resultType=core"
+  query_template: 'FIRST_PDATE:[{start} TO {end}] AND SRC:MED AND HAS_ABSTRACT:y AND PUB_TYPE:"journal article"'
+  years: [2015, 2016, 2017, 2018, 2019, 2020, 2021]
+  windows_per_year: 24          # random 2-day windows per year
+  window_days: 2
+  page_size: 160                # records kept per window (first page, sorted by P_PDATE_D asc)
+  target_working_sample: 25000  # subsampled from fetched pool, seed above
+  fetched_at: "2026-11-12"      # citation counts are cumulative to this date
+
+labeling:
+  # AI-adoption lexicon (case-insensitive, word-boundary regex).
+  # core terms weight 2, extended terms weight 1. ai_flag = (score >= 2).
+  core_terms:
+    - "artificial intelligence"
+    - "machine learning"
+    - "deep learning"
+    - "neural network"
+    - "convolutional neural"
+    - "recurrent neural"
+    - "natural language processing"
+    - "large language model"
+    - "reinforcement learning"
+    - "transfer learning"
+    - "generative adversarial"
+    - "autoencoder"
+  extended_terms:
+    - "random forest"
+    - "support vector machine"
+    - "gradient boosting"
+    - "xgboost"
+    - "lightgbm"
+    - "data mining"
+    - "bayesian network"
+    - "k-nearest neighbor"
+    - "transformer-based"
+    - "deep neural"
+  flag_threshold: 2
+  sensitivity:
+    strict_threshold: 3
+    loose_threshold: 1
+
+outcome:
+  # top-cited within publication-year cohort of the working sample
+  primary_percentile: 0.90      # top 10%
+  sensitivity_percentiles: [0.95, 0.80]
+
+split:
+  train_years: [2015, 2016, 2017, 2018]
+  test_years: [2019, 2020, 2021]
+  rationale: "time-based split; models predict the future, not the past"
+
+features:
+  numeric: ["n_authors", "n_keywords", "n_grants", "abstract_words", "title_words",
+            "journal_train_mean_cites", "journal_train_n_papers", "ai_score"]
+  binary: ["open_access", "is_review", "has_references", "english", "ai_flag"]
+  topic_dummies: 40             # most frequent informative keywords in TRAIN only
+  topic_min_df: 0.002           # keyword must appear in >= 0.2% of TRAIN papers
+  topic_max_df: 0.50            # ... and at most 50% (else uninformative)

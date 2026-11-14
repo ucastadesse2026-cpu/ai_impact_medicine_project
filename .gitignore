@@ -1,0 +1,56 @@
+# ============================================================ 
+#  ai_impact_medicine_project 
+# ============================================================ 
+ 
+# ---- Local-only deliverables ---- 
+slides/ 
+proposal/ 
+report/ 
+*.pptx 
+*.ppt 
+*.page 
+ 
+# ---- Data ---- 
+data/ 
+ 
+# ---- Outputs / model artifacts ---- 
+results/ 
+outputs/ 
+logs/ 
+runs/ 
+*.pt 
+*.pth 
+*.ckpt 
+*.onnx 
+*.pkl 
+*.joblib 
+*.h5 
+*.hdf5 
+ 
+# ---- Python / Conda ---- 
+__pycache__/ 
+*.py[cod] 
+*.egg-info/ 
+.pytest_cache/ 
+.ipynb_checkpoints/ 
+.conda/ 
+env/ 
+venv/ 
+.venv/ 
+ 
+# ---- IDE / OS ---- 
+.vscode/ 
+.idea/ 
+.DS_Store 
+Thumbs.db 
+desktop.ini 
+ 
+# ---- Secrets ---- 
+.env 
+*.key 
+*.pem 
+secrets/ 
+ 
+# ---- Whitelist ---- 
+!environment.yml 
+!requirements.txt 
